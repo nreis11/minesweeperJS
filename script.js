@@ -8,31 +8,41 @@ import {
   checkLose,
 } from "./minesweeper.js";
 
-const BOARD_SIZE = 5;
-const NUMBER_OF_MINES = 1;
+const BOARD_SIZE = 8;
+const NUMBER_OF_MINES = 8;
 
-const board = createBoard(BOARD_SIZE, NUMBER_OF_MINES);
-
-const minesLeftText = document.querySelector("[data-mine-count");
+const minesLeftText = document.createElement("span");
 const boardElement = document.querySelector(".board");
 const messageText = document.querySelector(".subtext");
+const newGameBtn = document.querySelector("#new-game-btn");
 
-board.forEach((row) => {
-  row.forEach((tile) => {
-    boardElement.append(tile.element);
-    tile.element.addEventListener("click", () => {
-      revealTile(board, tile);
-      checkGameEnd();
-    });
-    tile.element.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      markTile(tile);
-      listMinesLeft();
+function createGame(boardElement) {
+  boardElement.innerHTML = "";
+  boardElement.removeEventListener("click", stopProp, { capture: true });
+  boardElement.removeEventListener("contextmenu", stopProp, { capture: true });
+  const board = createBoard(BOARD_SIZE, NUMBER_OF_MINES);
+  board.forEach((row) => {
+    row.forEach((tile) => {
+      boardElement.append(tile.element);
+      tile.element.addEventListener("click", () => {
+        revealTile(board, tile);
+        checkGameEnd(board);
+      });
+      tile.element.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        markTile(tile);
+        listMinesLeft(board);
+      });
     });
   });
-});
 
-function listMinesLeft() {
+  messageText.innerText = "Mines Left: ";
+  minesLeftText.textContent = NUMBER_OF_MINES;
+  messageText.appendChild(minesLeftText);
+  boardElement.style.setProperty("--size", BOARD_SIZE);
+}
+
+function listMinesLeft(board) {
   const markedTilesCount = board.reduce((count, row) => {
     return (
       count + row.filter((tile) => tile.status === TILE_STATUSES.MARKED).length
@@ -41,7 +51,7 @@ function listMinesLeft() {
   minesLeftText.textContent = NUMBER_OF_MINES - markedTilesCount;
 }
 
-function checkGameEnd() {
+function checkGameEnd(board) {
   const win = checkWin(board, NUMBER_OF_MINES);
   const lose = checkLose(board);
 
@@ -54,7 +64,7 @@ function checkGameEnd() {
     messageText.textContent = "You won!";
   }
   if (lose) {
-    messageText.textContent = "You lose!";
+    messageText.textContent = "You lose. Game Over.";
     board.forEach((row) => {
       row.forEach((tile) => {
         if (tile.status === TILE_STATUSES.MARKED) markTile(tile);
@@ -68,13 +78,8 @@ function stopProp(e) {
   e.stopImmediatePropagation();
 }
 
-minesLeftText.textContent = NUMBER_OF_MINES;
-boardElement.style.setProperty("--size", BOARD_SIZE);
+newGameBtn.addEventListener("click", () => {
+  createGame(boardElement);
+});
 
-// createBoard (rows, cols, mines)
-// getNeighbors (board, row, col)
-// calculateMines (board, row, col)
-// handleClick (board, row, col)
-// handleRightClick (board, row, col)
-// traverse (board, row, col, visited)
-// isGameOver ()
+createGame(boardElement);

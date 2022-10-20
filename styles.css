@@ -47,12 +47,19 @@ body {
   cursor: pointer;
 }
 
+.board > [data-status="mine"]::before {
+  content: "💣";
+}
+
 .board > [data-status="mine"] {
   background-color: red;
 }
 
 .board > [data-status="number"] {
   background-color: none;
+}
+.board > [data-status="marked"]::before {
+  content: "🚩";
 }
 
 .board > [data-status="marked"] {

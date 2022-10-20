@@ -51,10 +51,6 @@ export function revealTile(board, tile) {
 
   tile.status = TILE_STATUSES.NUMBER;
   const adjacentTiles = nearbyTiles(board, tile);
-  console.log(
-    "🚀 ~ file: minesweeper.js ~ line 54 ~ revealTile ~ adjacentTiles",
-    adjacentTiles
-  );
   const mines = adjacentTiles.filter((tile) => tile.mine);
   if (mines.length === 0) {
     adjacentTiles.forEach(revealTile.bind(null, board));
